@@ -7,13 +7,18 @@ def do_ids(graph, start, end, depth, verbose):
         visited[start] = True
         goal = ids_step(graph, visited, [start], end, depth, verbose, depth)
         depth = depth + 1
+        if depth >= len(graph.nodes):
+            print("Path to goal not found")
+            return 0
 
 def ids_step(graph, visited, path, end, depth, verbose, final_depth):
     current_node = path[-1]
     if current_node == end:
+        print("Solution: ", end=" ")
         return show_path(path)
     if depth <=0:
-        print("Hit Depth = ",final_depth,": ",current_node)
+        if verbose:
+            print("Hit Depth = ",final_depth,": ",current_node)
         return False
     if verbose:
         print("Expand: ", current_node)
