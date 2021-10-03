@@ -26,7 +26,10 @@ def do_astar(graph, start, end, verbose):
         for next_node in alphabet_edges:
             new_cost = path_cost[follwed_path] + get_heuristic(graph.nodes[current_node], 
                 graph.nodes[next_node])
-            new_path = (*follwed_path, next_node)
+            if next_node not in follwed_path:
+                new_path = (*follwed_path, next_node)
+            else:
+                continue
             if new_path not in path_cost or new_cost < path_cost[new_path]:
                 path_cost[new_path] = new_cost
                 priority = new_cost + get_heuristic(graph.nodes[next_node], 
