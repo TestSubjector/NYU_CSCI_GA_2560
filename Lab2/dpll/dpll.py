@@ -4,7 +4,11 @@ def dp(atoms, sentences, verbose):
     table = dict()
     for A in atoms:
         table[A] = None;
-    return dp1(atoms,sentences,table, verbose)
+    table = dp1(atoms,sentences, table, verbose)
+    if table == None:
+        print("No valid DPLL solution exists for the CNF. Terminating program.")
+        exit(0)
+    return table
 
 def dp1(atoms,sentences,table, verbose):
     loop = True
@@ -36,7 +40,6 @@ def dp1(atoms,sentences,table, verbose):
             has_neg_atom = False
             neg_atom = "!" + atom
             for clause in sentences:
-                # print(atom, " ",has_atom, " ", has_neg_atom, " ", clause)
                 if atom in clause:
                     has_atom = True
                 if neg_atom in clause:
@@ -70,9 +73,9 @@ def dp1(atoms,sentences,table, verbose):
     if new_table != None:
         return new_table
     else:
-        print_cnf(sentences, verbose)
+        # print_cnf(sentences, verbose)
         if verbose:
-            print("Fail hard guess, try: ", atom, "= False")
+            print("Fail | Hard guess, try: ", atom, "= False")
         new_sentences = copy.deepcopy(sentences)
         new_table = copy.deepcopy(table)
         new_table[picked] = False
@@ -82,25 +85,29 @@ def dp1(atoms,sentences,table, verbose):
  
 def propagate(atom, sentences, table):
     if is_neg(atom):
-        neg_atom = atom.replace("!","")
-    else:
-        neg_atom = "!" + atom
+        atom = atom.replace("!","")
+    neg_atom = "!" + atom
     for idx, clause in enumerate(sentences):
         if (atom in clause and table[atom] == True) or (neg_atom in clause and table[atom] == False):
-            sentences[idx] = []
+            sentences[idx] = None
         elif atom in clause and table[atom] == False:
             sentences[idx].remove(atom)
+            if len(sentences[idx]) == 0:
+                print(atom, " Contradiction")
         elif neg_atom in clause and table[atom] == True:
             sentences[idx].remove(neg_atom)
-    new_sentences = list(filter(None, sentences))
+            if len(sentences[idx]) == 0:
+                print(neg_atom, " Contradiction")
+    new_sentences = [clause for clause in sentences if type(clause)==list]
     return new_sentences
 
 def set_and_remove(atom, sentences, loop):
     loop = True
-    for clause in sentences:
+    for idx, clause in enumerate(sentences):
         if atom in clause:
-            sentences.remove(clause)
-    return sentences
+            sentences[idx] = None
+    new_sentences = [clause for clause in sentences if type(clause)==list]
+    return new_sentences
 
 def is_neg(atom):
     if "!" in atom:
