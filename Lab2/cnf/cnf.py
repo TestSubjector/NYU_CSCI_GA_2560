@@ -1,4 +1,24 @@
 from atom import atom
+from precedence.pred import inf_to_post
+
+def bnf_to_cnf(input_form, atom_list):
+    cnf_list = []
+    for idx, line in enumerate(input_form):
+        postfix_line = inf_to_post(line)
+        # print(postfix_line)
+        input_form[idx] = remove_implies(postfix_line, atom_list).strip().split()
+        # print(" ".join(input_form[idx]))
+        input_form[idx] = convert_tree(input_form[idx])
+        input_form[idx] = handle_negate(input_form[idx])
+        # print_tree(input_form[idx])
+        # print()
+        input_form[idx] = distribute(input_form[idx])
+        # print_simpler_tree(input_form[idx])
+        # print()
+        input_form[idx] = [cnf_string(input_form[idx])]
+        input_form[idx] = input_form[idx][0].split("&")    
+        cnf_list += input_form[idx]
+    return cnf_list
 
 def remove_implies(postfix, atom_list):
     postfix.reverse()
@@ -31,7 +51,7 @@ def remove_implies(postfix, atom_list):
     
     return token
 
-def convert_tree(no_implied_string, atom_list):
+def convert_tree(no_implied_string):
     input = no_implied_string
     stack = []
     while len(input) > 0:
@@ -76,6 +96,18 @@ def print_simpler_tree(tree):
     print_simpler_tree(tree.right)
     if type(tree) is atom.Binary and tree.op == "&" and type(tree.right) is atom.Binary and tree.right.op != "&":
         print(")", end="")       
+
+def cnf_string(tree):
+    string = ""
+    if type(tree) == str:
+        string = string + tree
+        return string   
+    if type(tree) is atom.Binary:
+        if tree.op != "!":
+            string = string + cnf_string(tree.left)
+    string = string + cnf_string(tree.op)
+    string = string + cnf_string(tree.right)
+    return string
 
 def handle_negate(tree):
     if type(tree) is atom.Binary: 
