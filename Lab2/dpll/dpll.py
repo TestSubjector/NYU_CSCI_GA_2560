@@ -1,5 +1,11 @@
 import copy
 
+def do_dpll(input_form, atom_list, verbose):
+    table = dp(atom_list.members, input_form, verbose)
+    for atom in table:
+        print(atom,"=", table[atom])
+    return input_form
+
 def dp(atoms, sentences, verbose):
     table = dict()
     for A in atoms:

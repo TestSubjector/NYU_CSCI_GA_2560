@@ -6,7 +6,7 @@ def inf_to_post(line:str) -> str:
     # Check for equal number of paranthesis
     stack = []
     postfix = []
-    for token in line:     
+    for token in line:
         # print(token)       
         if token == "(":
             stack.append(token)
@@ -14,7 +14,7 @@ def inf_to_post(line:str) -> str:
             while not len(stack) == 0 and stack[-1] != "(":
                 postfix.append(stack.pop())
             stack.pop()
-        elif token.isalpha() or token.isdigit():
+        elif all(c.isalnum() or c == '_' for c in token):
             postfix.append(token)
         else:
             while not len(stack) == 0 and precedence(token) <= precedence(stack[-1]):
@@ -23,5 +23,5 @@ def inf_to_post(line:str) -> str:
     while not len(stack) == 0:
         postfix.append(stack.pop())
         # print(postfix)
-    # return " ".join(postfix)
+    # print( " ".join(postfix))
     return postfix

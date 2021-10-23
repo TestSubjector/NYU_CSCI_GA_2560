@@ -1,19 +1,14 @@
 from atom import atom
 from file import set_bnf_form
-import copy
 from precedence.pred import inf_to_post
 
 def do_cnf(input_data, args, verbose):
     input_form, atom_list = set_bnf_form(input_data)
     input_form = list(filter(None, input_form))
 
-    if args.mode != "CNF":
-        verbose = False 
     cnf_form = bnf_to_cnf(input_form, atom_list, verbose)
     cnf_form = [string.split("|") for string in cnf_form]
     if args.mode == "CNF":
-        if verbose:
-            print("Seperate into sentences")
         for cnf in cnf_form:
             print(*cnf)
     return cnf_form, atom_list
@@ -23,34 +18,44 @@ def bnf_to_cnf(input_form, atom_list, verbose):
     for idx, line in enumerate(input_form):
         input_form[idx] = inf_to_post(line)
 
-    if verbose:
-        print("Replace <=> & =>")
+    for idx, line in enumerate(input_form):
+        if verbose:
+            print(" ".join(remove_double_implies(input_form[idx], atom_list).strip().split()))
+
     for idx, line in enumerate(input_form):
         input_form[idx] = remove_implies(input_form[idx], atom_list).strip().split()
-        if verbose:
-            print("".join(input_form[idx]))
+
+        # print(" ".join(input_form[idx]))
     
-    if verbose:
-        print("Apply DeMorgan's")
     for idx, line in enumerate(input_form):
         input_form[idx] = convert_tree(input_form[idx])
         input_form[idx] = handle_negate(input_form[idx])
-        if verbose:
-            print_tree(input_form[idx])
-            print()
-    
-    if verbose:
-        print("Apply distribution")
+        # print_tree(input_form[idx])
+        # print()
     for idx, line in enumerate(input_form):
         input_form[idx] = distribute(input_form[idx])
-        if verbose:
-            print_simpler_tree(input_form[idx])
-            print()
+        # print_simpler_tree(input_form[idx])
+        # print()
     for idx, line in enumerate(input_form):
         input_form[idx] = [cnf_string(input_form[idx])]
         input_form[idx] = input_form[idx][0].split("&")    
         cnf_list += input_form[idx]
     return cnf_list
+
+def remove_double_implies(postfix):
+    postfix.reverse()
+    stack = []
+    token = ""
+    while len(postfix) > 0:
+        token = postfix.pop()
+        if token == "<=>":
+            token_1 = stack.pop()
+            token_2 = stack.pop()
+            postfix.append(" ( " + " ( " +  " ( " + token_2 +  " ) " +  " => " + token_1 + " )"
+            +" & " + "( " +  " ( " + token_1 +  " ) " + " => " + token_2 + " ) " + " ) ")
+        else:
+            stack.append(token)
+    return token
 
 def remove_implies(postfix, atom_list):
     postfix.reverse()
