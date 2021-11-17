@@ -49,39 +49,44 @@ def cal_policy(target_node, nl, arg_min):
         elif total_sum > cur_value:
             target_node.cur_policy = main_edge
             cur_value = total_sum
-    print(target_node.name, cur_value)
+    # print(target_node.name, cur_value)
     return target_node.cur_policy
 
 def markov_solver(node_list, df, arg_min, tol, arg_iter):
-    policy_list = {}
-    value_list = {}
     for key in node_list.keys():
         if node_list[key].isTerminal == False:
             node_list[key].cur_policy = node_list[key].edges[0]
-            policy_list[key] = node_list[key].cur_policy
-            value_list[key] = node_list[key].value
+
     while True:
-        policy_flag = False
         # Value Iteration Loop
-        for isd in range(arg_iter):
-            value_flag = False
-            for key in node_list.keys():
-                new_value = bellman(node_list[key], node_list, df)
-                if (abs(new_value - node_list[key].value) > tol):
-                    value_flag = True
-                node_list[key].value = new_value
+        for _ in range(arg_iter):
+            value_flag = value_iteration(node_list, tol, df)
             if not value_flag:
                 break
-        # break
+
         # Policy Iteration Loop
-        for key in node_list.keys():
-            target_node = node_list[key]
-            if target_node.isDecision:
-                old_policy = target_node.cur_policy 
-                new_policy = cal_policy(target_node, node_list, arg_min)
-                if old_policy != new_policy:
-                    policy_flag = True
-                target_node.cur_policy = new_policy
+        policy_flag = policy_iteration(node_list, arg_min)
         if not policy_flag:
             break
             
+def value_iteration(node_list, tol, df):
+    value_flag = False
+    for key in node_list.keys():
+        new_value = bellman(node_list[key], node_list, df)
+        if (abs(new_value - node_list[key].value) > tol):
+            value_flag = True
+        node_list[key].value = new_value
+    return value_flag    
+
+def policy_iteration(node_list, arg_min):
+    policy_flag = False
+    for key in node_list.keys():
+        target_node = node_list[key]
+        if target_node.isDecision:
+            old_policy = target_node.cur_policy 
+            new_policy = cal_policy(target_node, node_list, arg_min)
+            if old_policy != new_policy:
+                policy_flag = True
+            target_node.cur_policy = new_policy
+    return policy_flag
+    

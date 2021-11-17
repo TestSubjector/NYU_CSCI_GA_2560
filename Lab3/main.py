@@ -28,7 +28,11 @@ def main():
     process.markov_solver(node_list, args.df, args.min, args.tol, args.iter)
     
     for key in node_list.keys():
-        node_list[key].print_node()
-
+        if node_list[key].isDecision:
+            node_list[key].print_policy()
+    print()
+    for key in node_list.keys():
+        print(node_list[key].name,"=",node_list[key].value, end = " ")
+    print()
 if __name__ == "__main__":
     main()

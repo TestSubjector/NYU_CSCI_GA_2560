@@ -40,3 +40,6 @@ class Node:
     def print_node(self):
         print(self.name, self.isChance, self.isDecision, self.isTerminal,
             self.value, self.edges, self.prob, self.cur_policy)
+
+    def print_policy(self):
+        print(self.name," -> ", self.cur_policy)
