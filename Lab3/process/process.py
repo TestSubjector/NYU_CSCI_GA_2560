@@ -19,7 +19,9 @@ def cal_score(target_node, nl):
     if target_node.isDecision:
         total_sum = 0
         main_prob = target_node.prob[0]
-        rem_prob = (1-main_prob)/(len(target_node.edges) - 1)
+        rem_prob = 0
+        if len(target_node.edges) != 1: # To handle special case
+            rem_prob = (1-main_prob)/(len(target_node.edges) - 1)
         policy = target_node.cur_policy
         for _, edge in enumerate(target_node.edges):
             if edge == policy:
@@ -33,7 +35,9 @@ def cal_score(target_node, nl):
 
 def cal_policy(target_node, nl, arg_min):
     main_prob = target_node.prob[0]
-    rem_prob = (1-main_prob)/(len(target_node.edges) - 1)
+    rem_prob = 0
+    if len(target_node.edges) != 1:
+        rem_prob = (1-main_prob)/(len(target_node.edges) - 1)
     cur_value = target_node.value
     for _, main_edge in enumerate(target_node.edges):
         total_sum = 0
@@ -42,13 +46,15 @@ def cal_policy(target_node, nl, arg_min):
                 total_sum+= main_prob*nl[side_edge].value
             else:
                 total_sum+= rem_prob*nl[side_edge].value
-        # print("=> ", main_edge, cur_value, total_sum, nl[main_edge].value)
-        if arg_min and total_sum < cur_value:
-            target_node.cur_policy = main_edge
-            cur_value = total_sum
+        # print("1=> ",target_node.name, "P -",target_node.cur_policy, main_edge, cur_value, total_sum, nl[main_edge].value)
+        if arg_min:
+            if total_sum < cur_value:
+                target_node.cur_policy = main_edge
+                cur_value = total_sum
         elif total_sum > cur_value:
             target_node.cur_policy = main_edge
             cur_value = total_sum
+        # print("2=> ",target_node.name, "P -",target_node.cur_policy, main_edge, cur_value, total_sum, nl[main_edge].value)
     # print(target_node.name, cur_value)
     return target_node.cur_policy
 
