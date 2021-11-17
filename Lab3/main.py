@@ -12,10 +12,10 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.par
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-df", const=str, nargs="?", default=1.0)
-    parser.add_argument("-min", const=str, nargs="?", default= False)
-    parser.add_argument("-tol",const=str, nargs="?", default=0.01)
-    parser.add_argument("-iter",const=str, nargs="?", default=100)
+    parser.add_argument("-df", const=str, nargs="?", type =float,default=1.0)
+    parser.add_argument("-min", const=str, nargs="?", default=False)
+    parser.add_argument("-tol",const=str, nargs="?", type =float, default=0.01)
+    parser.add_argument("-iter",const=str, nargs="?", type =int, default=100)
     parser.add_argument("-i", "--input", const=str, nargs="?", default=None)
     args = parser.parse_args()
 
@@ -24,6 +24,9 @@ def main():
     input_data = handle_file(args)
     node_list = set_nodes(input_data)
     process.process_nodes(node_list)
+
+    process.markov_solver(node_list, args.df, args.min, args.tol, args.iter)
+    
     for key in node_list.keys():
         node_list[key].print_node()
 
