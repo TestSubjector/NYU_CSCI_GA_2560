@@ -1,9 +1,15 @@
 import operator
 
 def output_knn(train_list, test_node_list, k_value, distance_fn, unitw):
-    output_process = []
+    output_process = {} # Tuple for (Match, Want, Got)
     for test_node in test_node_list:
         do_knn(train_list, test_node, k_value, distance_fn, unitw, output_process)
+    for label_key in output_process:
+        match = str(output_process[label_key][0])
+        got = str(output_process[label_key][1])
+        want = str(output_process[label_key][2])
+        print("Label="+ label_key + " Precision=" + match + "/" + got + 
+            " Recall=" + match + "/" + want)
 
 def do_knn(train_list, test_node, k_value, distance_fn, unitw, output_process):
     distance_store = []
@@ -18,14 +24,21 @@ def do_knn(train_list, test_node, k_value, distance_fn, unitw, output_process):
         index = item[0]
         node_label = train_list[index].identity
         weight = 1/(max(item[1], 0.0001))
-        if unitw:
+        if unitw != False:
             weight = 1
         if node_label in vote_dict:
             vote_dict[node_label] += weight
         else:
             vote_dict[node_label] = weight
-
-    print("want=",test_node.identity," got=",max(vote_dict.items(), key=operator.itemgetter(1))[0])
+    got_identity = max(vote_dict.items(), key=operator.itemgetter(1))[0]
+    print("want=" + test_node.identity + " got=" + got_identity)
+    if test_node.identity not in output_process:
+        output_process[test_node.identity] = [0,0,0]
+    output_process[test_node.identity][0] += int(test_node.identity == got_identity)
+    output_process[test_node.identity][2] += 1 
+    if got_identity not in output_process:
+        output_process[got_identity] = [0,0,0]
+    output_process[got_identity][1] += 1
 
 def e2(node1, node2):
     total_sum = 0
