@@ -8,3 +8,9 @@ class Node:
 
     def print_node(self):
         print(self.identity, self.pred_list)
+    
+    def is_same_cp(self, new_centroid):
+        if self.cp == new_centroid:
+            return True
+        else:
+            return False

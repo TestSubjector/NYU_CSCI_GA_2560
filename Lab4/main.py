@@ -4,7 +4,7 @@ import sys
 import os
 from file import handle_file, set_nodes, set_centroids
 from knn.knn import output_knn, e2, manh, sanity_check
-from kmeans.kmeans import sanity_check_kmeans
+from kmeans.kmeans import sanity_check_kmeans, run_kmeans
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
@@ -37,7 +37,7 @@ def main():
         elif args.d == "manh":
             output_knn(train_node_list, test_node_list, args.k, distance_fn=manh, unitw=args.unitw)
         else:
-            print("Distance flag has an error. Terminating program")
+            print("Distance flag has an error for knn. Terminating program")
             exit(0)
     elif args.mode == "kmeans":
         kmeans_data = handle_file(args.data)
@@ -48,6 +48,13 @@ def main():
         # for item in centroid_list:
         #     item.print_node()
         sanity_check_kmeans(kmeans_node_list, centroid_list)
+        if args.d == "e2":
+            run_kmeans(kmeans_node_list, centroid_list, distance_fn=e2)
+        elif args.d == "manh":
+            run_kmeans(kmeans_node_list, centroid_list, distance_fn=manh)
+        else:
+            print("Distance flag has an error for kmeans. Terminating program")
+            exit(0)
 
 if __name__ == "__main__":
     main()
