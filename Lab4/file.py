@@ -11,16 +11,27 @@ def set_nodes(graph_data):
         
         current_node = node.Node(line[-1])
         for pred in line[:-1]:
-            current_node.add_pred(pred)
-        current_node.print_node()
+            current_node.add_pred(int(pred))
+        # current_node.print_node()
         node_list.append(current_node)
     return node_list
 
-def handle_file(args):
+def handle_train_file(args):
     try:
-        input_file = open(args.input or "input.txt", "r")
+        input_file = open(args.train or "input.txt", "r")
     except FileNotFoundError:
-        print("File input.txt not found. Terminating program")
+        print("Training file not found. Terminating program")
+        exit(0)
+
+    input_data = input_file.read()
+    input_file.close()
+    return input_data
+
+def handle_test_file(args):
+    try:
+        input_file = open(args.test)
+    except FileNotFoundError:
+        print("Test file not found. Terminating program")
         exit(0)
 
     input_data = input_file.read()
