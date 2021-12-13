@@ -51,3 +51,14 @@ def manh(node1, node2):
 
 def on_index(element):
     return element[1]
+
+def sanity_check(train_list, test_list):
+    dimension = len(train_list[0].pred_list)
+    for idx, node in enumerate(train_list):
+        if len(node.pred_list) != dimension:
+            print("Dimension problems for training input, number -", idx,". Terminating program")
+            exit(0)
+    for idx, node in enumerate(test_list):
+        if len(node.pred_list) != dimension:
+            print("Dimension problems for testing input, number -", idx,". Terminating program")
+            exit(0)

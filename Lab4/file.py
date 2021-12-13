@@ -16,9 +16,9 @@ def set_nodes(graph_data):
         node_list.append(current_node)
     return node_list
 
-def handle_train_file(args):
+def handle_file(args_input):
     try:
-        input_file = open(args.train or "input.txt", "r")
+        input_file = open(args_input, "r")
     except FileNotFoundError:
         print("Training file not found. Terminating program")
         exit(0)
@@ -27,13 +27,12 @@ def handle_train_file(args):
     input_file.close()
     return input_data
 
-def handle_test_file(args):
-    try:
-        input_file = open(args.test)
-    except FileNotFoundError:
-        print("Test file not found. Terminating program")
-        exit(0)
-
-    input_data = input_file.read()
-    input_file.close()
-    return input_data
+def set_centroids(centroid_args):
+    centroid_list = []
+    for idx,item in enumerate(centroid_args):
+        item = item.replace(","," ").strip().split()
+        current_node = node.Node("C"+str(idx+1))
+        for coord in item:
+            current_node.add_pred(int(coord))
+        centroid_list.append(current_node)
+    return centroid_list
